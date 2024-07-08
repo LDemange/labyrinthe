@@ -10,6 +10,7 @@ from fantome import *
 from boule import *
 from pacgomme import *
 from random import randrange
+import math
 
 class Joueur(pg.sprite.Sprite):
     """Classe qui crée un personnage Paco contrôlable par le joueur ou suivant un chemin
@@ -145,10 +146,10 @@ class Joueur(pg.sprite.Sprite):
         # lorsque le joueur est sur un tile 
         if self.rect.y%HAUTEUR_TILE == 0 and self.rect.x%LARGEUR_TILE == 0:
             # on évalue si il peut prendre la direction voulue quand par exemple elle est différente de la direction actuelle
-            self.ligne = self.rect.y/HAUTEUR_TILE
-            self.colonne = self.rect.x/LARGEUR_TILE
+            self.ligne = math.floor(self.rect.y/HAUTEUR_TILE)
+            self.colonne = math.floor(self.rect.x/LARGEUR_TILE)
             if self.directionVoulue == 'droite' :
-                colonne = (self.colonne+1)%len(self.levelCourant.matrice[0])
+                colonne = math.floor((self.colonne+1)%len(self.levelCourant.matrice[0]))
                 if self.levelCourant.matrice[self.ligne][colonne] != 1:
                     self.direction = 'droite'
                     self.h = 1
@@ -156,7 +157,7 @@ class Joueur(pg.sprite.Sprite):
                     self.animation()                    
                     return
             elif self.directionVoulue == 'gauche':
-                colonne = (self.colonne-1)%len(self.levelCourant.matrice[0])
+                colonne = math.floor((self.colonne-1)%len(self.levelCourant.matrice[0]))
                 if self.levelCourant.matrice[self.ligne][colonne] != 1:
                     self.direction = 'gauche'
                     self.h = -1
@@ -164,7 +165,7 @@ class Joueur(pg.sprite.Sprite):
                     self.animation()                    
                     return                    
             elif self.directionVoulue == 'haut':
-                ligne = (self.ligne-1)%len(self.levelCourant.matrice)
+                ligne = math.floor((self.ligne-1)%len(self.levelCourant.matrice))
                 if self.levelCourant.matrice[ligne][self.colonne] != 1:
                     self.direction = 'haut'
                     self.h = 0
@@ -172,7 +173,7 @@ class Joueur(pg.sprite.Sprite):
                     self.animation()
                     return                    
             elif self.directionVoulue == 'bas':
-                ligne = (self.ligne+1)%len(self.levelCourant.matrice)
+                ligne = math.floor((self.ligne+1)%len(self.levelCourant.matrice))
                 if self.levelCourant.matrice[ligne][self.colonne] != 1:
                     self.direction = 'bas'                    
                     self.h = 0
@@ -181,12 +182,10 @@ class Joueur(pg.sprite.Sprite):
                     return
 
             # si le joueur ne peut pas prendre la direction voulue, on évalue si il peut se déplacer dans sa direction actuelle
-            colonne = (self.colonne+self.h)%len(self.levelCourant.matrice[0])
-            ligne = (self.ligne+self.v)%len(self.levelCourant.matrice)
+            colonne = math.floor((self.colonne+self.h)%len(self.levelCourant.matrice[0]))
+            ligne = math.floor((self.ligne+self.v)%len(self.levelCourant.matrice))
             
             
-            print(ligne)
-            print(colonne)
             if self.levelCourant.matrice[ligne][colonne] == 1:
                 self.h = 0
                 self.v = 0

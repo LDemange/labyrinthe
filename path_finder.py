@@ -8,6 +8,7 @@ from pygame.locals import *
 import threading
 from constantes import *
 from random import randrange,choice
+import math
 
 class Noeud(object):
     """Classe qui crée un noeud pour l'algorithme A star."""
@@ -122,8 +123,8 @@ class PathFinder(threading.Thread):
                                 voisin.parent = noeudCourant
                         # mode de recherche prennant en compte le swap écran                                
                         else:
-                            ligne = (noeudCourant.ligne+direction[0])%len(self.mobile.levelCourant.matrice)
-                            colonne = (noeudCourant.colonne+direction[1])%len(self.mobile.levelCourant.matrice[0])
+                            ligne = math.floor((noeudCourant.ligne+direction[0])%len(self.mobile.levelCourant.matrice))
+                            colonne = math.floor((noeudCourant.colonne+direction[1])%len(self.mobile.levelCourant.matrice[0]))
                             if self.mobile.levelCourant.matrice[ligne][colonne] != 1 :
                                 voisin = Noeud(ligne,colonne)                                
                                 voisin.parent = noeudCourant
