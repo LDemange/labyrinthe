@@ -19,13 +19,13 @@
 from tkinter import *
 
 class Case:
-    def __init__(self,x1, x2, y1, y2, CouleurCase, CouleurPion, pion):
+    def __init__(self,x1, y1, x2, y2, couleurCase, couleurPion, pion):
         self.x1 = x1
         self.x2 = x2
         self.y1 = y1
         self.y2 = y2
-        self.CouleurCase = CouleurCase
-        self.CouleurPion = CouleurPion
+        self.couleurCase = couleurCase
+        self.couleurPion = couleurPion
         self.pion = pion
     
     def __eq__(self, other):
@@ -41,9 +41,9 @@ class Case:
         set.pion = val
         
     def setCouleurPion(self, val):
-        self.CouleurPion = val
+        self.couleurPion = val
         
-    def CreerCase(self):
+    def creerCase(self):
         can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.couleurCase)
         
     def placerPion(self):
@@ -61,6 +61,33 @@ def laby():
         if i <=12 :
             couleurPion = '#9feb87'
             tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,couleurPion,1))
+        
+        elif i > 13 :
+            couleurPion = '#ffde01'
+            tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,couleurPion,1))
+        
+        else :
+            tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,'',0)) 
+        
+        tout_les_cases[-1].creerCase()
+        
+        i,ite,x1,x2 = i+1, ite+1, x1+40, x2+40
+        
+        if ite == 5:
+            y1, y2 = y1 + 40, y2 + 40
+            ite, x1, x2 = 0, 5, 45
+            
+        if i%2 == 0:
+            couleurCase = 'white'
+            
+        else:
+            couleurCase = '#f07ab7'
+        
+    for case in tout_les_cases:
+        case.placerPion()
+        
+    bouttonLaby.destroy()
+    score.pack()
     
 #initialisation des variables
 x1, y1, x2, y2  = 5, 5, 45, 45
@@ -70,7 +97,7 @@ fen = Tk()
 fen.title('labyrinthe')
 fen.geometry('260x245+450+250')
 fen.configure(bg = 'white')
-can = Canvas(fen, width = 2, heigh = 206, bg = 'pink')
+can = Canvas(fen, width = 206, heigh = 206, bg = 'pink')
     
 font = 'arial 13 bold'
     
