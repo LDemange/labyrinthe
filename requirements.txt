@@ -6,6 +6,7 @@ wheel>=0.29
 
 # game
 pygame
+#python3-tk
 
 # data science
 numpy
