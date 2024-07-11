@@ -129,9 +129,11 @@ def click(event):
     pionClicker = 0
     caseDepart = 0
     clicker = can.find_overlapping(x,y,x,y)
-    if len(clicker) > 1:
-        coord = can.coords(clicker[0])
+    if len(clicker) > 1 :
+        coord = can.coords(clicker[1])
+        print(coord[0],coord[1],coord[2],coord[3])
         caseDepart = trouverCase(coord)
+       #print(coord)
         if caseDepart.couleurPion == session:
             pionClicker = 0
         else:
@@ -157,7 +159,6 @@ def arret(event):
 
 fen = Tk()
 fen.title('labyrinthe')
-#fen.geometry('260x245+450+250')
 size_window = length_laby*length_case + 40
 fen.geometry(f'{size_window}x{size_window}+450+250')
 fen.configure(bg = 'white')
