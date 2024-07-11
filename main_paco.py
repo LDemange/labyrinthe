@@ -16,6 +16,7 @@
 ################################################################################
 #import pygame as pg
 #from pygame.locals import *
+from random import randrange
 from tkinter import *
 
 class Case:
@@ -43,8 +44,14 @@ class Case:
     def setCouleurPion(self, val):
         self.couleurPion = val
         
-    def creerCase(self):
-        can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.couleurCase)
+    def creerRectangle(self,nature):
+        if nature == 'case':
+            can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.couleurCase, width=2)
+        elif nature == 'section':
+            can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.couleurCase, width=5, outline = 'red')
+        else:
+            return 0
+            
         
     def placerPion(self):
         if self.pion:
@@ -56,39 +63,45 @@ class Case:
             return 0
         else:
             return 0 # A terminer
-    """
-    Purpose: 
-    """
     
 def laby():
     global x1, y1, x2, y2
+    global length_laby, length_case 
     ite, i, couleurCase = 0,1,'#f07ab7'
     
-    while x1<200 and y1<200 :
-        if i <=12 :
-            couleurPion = '#9feb87'
-            tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,couleurPion,1))
-        
-        elif i > 13 :
-            couleurPion = '#ffde01'
-            tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,couleurPion,1))
-        
-        else :
-            tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,'',0)) 
-        
-        tout_les_cases[-1].creerCase()
-        
-        i,ite,x1,x2 = i+1, ite+1, x1+40, x2+40
-        
-        if ite == 5:
-            y1, y2 = y1 + 40, y2 + 40
-            ite, x1, x2 = 0, 5, 45
-            
-        if i%2 == 0:
+    while x1 < length_laby*length_case and  y1 < length_laby*length_case :
+        #if i <=12 :
+        #    couleurPion = '#9feb87'
+        #    tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,couleurPion,1))
+        if(randrange(0, 2, 1)):
             couleurCase = 'white'
-            
         else:
-            couleurCase = '#f07ab7'
+            couleurCase = 'black'
+            
+        tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,'',0)) 
+        
+        tout_les_cases[-1].creerRectangle('case')
+        
+        i,ite,x1,x2 = i+1, ite+1, x1+length_case, x2+length_case
+        
+        if ite == int(length_laby):
+            y1, y2 = y1 + length_case, y2 + length_case
+            ite, x1, x2 = 0, 5, 5+length_case
+    
+    length_section = length_case * 3        
+    x1, y1, x2, y2  = 5, 5, length_section+5, length_section+5
+    
+    while x1 < length_laby*length_case and  y1 < length_laby*length_case :
+    
+        tout_les_section.append(Case(x1,y1,x2,y2,'','',0)) 
+        
+        tout_les_section[-1].creerRectangle('section')
+        
+        i,ite,x1,x2 = i+1, ite+1, x1+length_section, x2+length_section
+        
+        if ite == int(length_laby/3):
+            y1, y2 = y1 + length_section, y2 + length_section
+            ite, x1, x2 = 0, 5, 5+length_section
         
     for case in tout_les_cases:
         case.placerPion()
@@ -97,8 +110,11 @@ def laby():
     score.pack()
     
 #initialisation des variables
-x1, y1, x2, y2  = 5, 5, 45, 45
+length_laby = 15 # Case number, multiple de 3 svp
+length_case = 60 # pixel number, multiple de 3 svp
+x1, y1, x2, y2  = 5, 5, length_case+5, length_case+5
 tout_les_cases = []
+tout_les_section = []
 session = ''
 
 def trouverCase(coord):
@@ -141,9 +157,11 @@ def arret(event):
 
 fen = Tk()
 fen.title('labyrinthe')
-fen.geometry('260x245+450+250')
+#fen.geometry('260x245+450+250')
+size_window = length_laby*length_case + 40
+fen.geometry(f'{size_window}x{size_window}+450+250')
 fen.configure(bg = 'white')
-can = Canvas(fen, width = 206, heigh = 206, bg = 'pink')
+can = Canvas(fen, width = length_laby*length_case+10, heigh = length_laby*length_case+10, bg = 'pink')
     
 font = 'arial 13 bold'
     
