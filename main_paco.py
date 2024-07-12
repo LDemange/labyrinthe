@@ -18,7 +18,7 @@
 #from pygame.locals import *
 from random import randrange
 from tkinter import *
-from math import ceil
+from math import ceil, cos, sin, pi
 
 class Case:
     def __init__(self,x1, y1, x2, y2, couleurCase, couleurPion, pion):
@@ -136,6 +136,16 @@ def findCoordSection(coord):
     yd_s = yg_s + length_case*3
     
     return xg_s, yg_s, xd_s, yd_s
+
+def rotate(xc, yc, theta, x_in, y_in): # rotation de centre (xc,yc) d'angle theta (rad) du vecteur (x,y)
+    x_in = x_in - xc
+    y_in = y_in - yc
+    x_out = x_in * cos(theta) - y_in * sin(theta)
+    y_out = x_in*sin(theta) + y_in*cos(theta)
+    x_out = x_out + xc
+    y_out = y_out + yc
+    return x_out, y_out
+    
     
 def click_g(event):
     global caseDepart, pionClicker, session
@@ -163,14 +173,24 @@ def click_d(event):
     clicker = can.find_overlapping(x,y,x,y)
     if len(clicker) > 0 :
         coord = can.coords(clicker[0])
-        print('click2=',coord[0],coord[1],coord[2],coord[3])
-        print('section=',findCoordSection(coord))
+        #print('click2=',coord[0],coord[1],coord[2],coord[3])
+        #print('section=',findCoordSection(coord))
         xg_s, yg_s, xd_s, yd_s = findCoordSection(coord)
-        print('xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps=',xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps)
+        #print('xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps=',xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps)
         section_matrix = can.find_overlapping(xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps)
-        print('len=',len(section_matrix))
-        for i in range(0,len(section_matrix)):
-            print('section_matrix',can.coords(section_matrix[i]))
+        #print('len=',len(section_matrix))
+        xc = (xg_s + xd_s)/2
+        yc = (yg_s + yd_s)/2
+        for i in range(len(section_matrix)):
+            coord = can.coords(section_matrix[i])
+            print('xc=',xc,'yc=',yc)
+            print('coord=',coord)
+            xg, yg = rotate(xc, yc, pi/2, coord[0], coord[1])
+            xd, yd = rotate(xc, yc, pi/2, coord[2], coord[3])
+            print('coord_out=',xg,yg,xd,yd)
+            deplacement = [[xg, yg,xd,yd]] #A terminer, comprendre
+            can.coords(section_matrix[0], deplacement[0])
+            #print('section_matrix',can.coords(section_matrix[i]))
         caseDepart = trouverCase(coord)
        #print(coord)
         if caseDepart.couleurPion == session:
