@@ -18,6 +18,7 @@
 #from pygame.locals import *
 from random import randrange
 from tkinter import *
+from math import ceil
 
 class Case:
     def __init__(self,x1, y1, x2, y2, couleurCase, couleurPion, pion):
@@ -113,6 +114,7 @@ def laby():
 length_laby = 15 # Case number, multiple de 3 svp
 length_case = 60 # pixel number, multiple de 3 svp
 x1, y1, x2, y2  = 5, 5, length_case+5, length_case+5
+eps = 3
 tout_les_cases = []
 tout_les_section = []
 session = ''
@@ -123,15 +125,52 @@ def trouverCase(coord):
             return case
     return 0
 
-def click(event):
+def findCoordSection(coord):
+    num_x = ceil((coord[2]+coord[0])/(3*2*length_case))
+    num_y = ceil((coord[3]+coord[1])/(3*2*length_case))
+    print('num=',num_x,num_y)
+    xg_s = 5 + 3*length_case*(num_x-1)
+    yg_s = 5 + 3*length_case*(num_y-1)
+    
+    xd_s = xg_s + length_case*3
+    yd_s = yg_s + length_case*3
+    
+    return xg_s, yg_s, xd_s, yd_s
+    
+def click_g(event):
     global caseDepart, pionClicker, session
     x, y = event.x, event.y 
     pionClicker = 0
     caseDepart = 0
     clicker = can.find_overlapping(x,y,x,y)
-    if len(clicker) > 1 :
-        coord = can.coords(clicker[1])
+    if len(clicker) > 0 :
+        coord = can.coords(clicker[0])
         print(coord[0],coord[1],coord[2],coord[3])
+        caseDepart = trouverCase(coord)
+       #print(coord)
+        if caseDepart.couleurPion == session:
+            pionClicker = 0
+        else:
+            pionClicker = clicker[1]
+
+
+      
+def click_d(event):
+    global caseDepart, pionClicker, session
+    x, y = event.x, event.y 
+    pionClicker = 0
+    caseDepart = 0
+    clicker = can.find_overlapping(x,y,x,y)
+    if len(clicker) > 0 :
+        coord = can.coords(clicker[0])
+        print('click2=',coord[0],coord[1],coord[2],coord[3])
+        print('section=',findCoordSection(coord))
+        xg_s, yg_s, xd_s, yd_s = findCoordSection(coord)
+        print('xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps=',xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps)
+        section_matrix = can.find_overlapping(xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps)
+        print('len=',len(section_matrix))
+        for i in range(0,len(section_matrix)):
+            print('section_matrix',can.coords(section_matrix[i]))
         caseDepart = trouverCase(coord)
        #print(coord)
         if caseDepart.couleurPion == session:
@@ -172,7 +211,8 @@ score = Label(fen, text = 'V : 0 vs J : 0', font = font, fg ='white', bg ='#f00a
 can.pack()
 bouttonLaby.pack()
     
-can.bind('<ButtonPress-1>', click)
+can.bind('<ButtonPress-1>', click_g) # bouton gauche de la souris => click_g
+can.bind('<ButtonPress-3>', click_d) # bouton droit de la souris => click_d
 can.bind('<B1-Motion>', bouger)
 can.bind('<ButtonRelease-1>', arret)
 can.configure(cursor = 'hand2')
