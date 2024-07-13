@@ -19,6 +19,7 @@
 from random import randrange
 from tkinter import *
 from math import ceil, cos, sin, pi
+from motifs import *
 
 class Case:
     def __init__(self,x1, y1, x2, y2, couleurCase, couleurPion, pion):
@@ -64,34 +65,41 @@ class Case:
             return 0
         else:
             return 0 # A terminer
+        
+def buildSection(num):
+    xs_g = 5+3*length_case*(num-1)
+    ys_g = 5+3*length_case*(int(num/5))
+    return xs_g, ys_g
+    
     
 def laby():
-    global x1, y1, x2, y2
-    global length_laby, length_case 
     ite, i, couleurCase = 0,1,'#f07ab7'
+    m_wall = []
     
-    while x1 < length_laby*length_case and  y1 < length_laby*length_case :
-        #if i <=12 :
-        #    couleurPion = '#9feb87'
-        #    tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,couleurPion,1))
-        if(randrange(0, 2, 1)):
-            couleurCase = 'white'
-        else:
-            couleurCase = 'black'
+    nb_section = int((length_laby/3)**2)
+    
+    for i in range(0,nb_section):
+        motif = motifs[randrange(0,5,1)]
+        m_wall.append(motif)
+    
+    for i in range(0,nb_section):
+        xs_g = 5+3*length_case*(i%5)
+        ys_g = 5+3*length_case*(int(i/5))
+        for j in range(0,9):
+            x1 = xs_g + (j%3)*length_case
+            x2 = x1 + length_case
+            y1 = ys_g + int(j/3)*length_case
+            y2 = y1 + length_case
             
-        tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,'',0)) 
-        
-        tout_les_cases[-1].creerRectangle('case')
-        
-        i,ite,x1,x2 = i+1, ite+1, x1+length_case, x2+length_case
-        
-        if ite == int(length_laby):
-            y1, y2 = y1 + length_case, y2 + length_case
-            ite, x1, x2 = 0, 5, 5+length_case
-    
-    length_section = length_case * 3        
-    x1, y1, x2, y2  = 5, 5, length_section+5, length_section+5
-    
+            if(m_wall[i][j%3][int(j/3)]):
+                couleurCase = 'black'
+                tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,'',0))
+            else:
+                couleurCase = 'white'
+                tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,'',0))
+                
+            tout_les_cases[-1].creerRectangle('case')
+       
     while x1 < length_laby*length_case and  y1 < length_laby*length_case :
     
         tout_les_section.append(Case(x1,y1,x2,y2,'','',0)) 
@@ -111,9 +119,9 @@ def laby():
     score.pack()
     
 #initialisation des variables
-length_laby = 15 # Case number, multiple de 3 svp
+length_laby = 15 # Case number, choisir un multiple de 3 svp
 length_case = 60 # pixel number, multiple de 3 svp
-x1, y1, x2, y2  = 5, 5, length_case+5, length_case+5
+length_section = 3
 eps = 3
 tout_les_cases = []
 tout_les_section = []
@@ -138,6 +146,7 @@ def findCoordSection(coord):
     return xg_s, yg_s, xd_s, yd_s
 
 def rotate(xc, yc, theta, x_in, y_in): # rotation de centre (xc,yc) d'angle theta (rad) du vecteur (x,y)
+    theta = -theta
     x_in = x_in - xc
     y_in = y_in - yc
     x_out = x_in * cos(theta) - y_in * sin(theta)
@@ -189,7 +198,7 @@ def click_d(event):
             xd, yd = rotate(xc, yc, pi/2, coord[2], coord[3])
             print('coord_out=',xg,yg,xd,yd)
             deplacement = [[xg, yg,xd,yd]] #A terminer, comprendre
-            can.coords(section_matrix[0], deplacement[0])
+            can.coords(section_matrix[i], deplacement[0])
             #print('section_matrix',can.coords(section_matrix[i]))
         caseDepart = trouverCase(coord)
        #print(coord)
