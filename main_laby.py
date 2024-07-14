@@ -50,7 +50,7 @@ class Case:
         if nature == 'case':
             can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.couleurCase, width=2)
         elif nature == 'section':
-            can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.couleurCase, width=5, outline = 'red')
+            can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.couleurCase, width=3, outline = 'red')
         else:
             return 0
             
@@ -76,15 +76,16 @@ def laby():
     ite, i, couleurCase = 0,1,'#f07ab7'
     m_wall = []
     
-    nb_section = int((length_laby/3)**2)
+    nb_section = int(length_laby*heigh_laby/9)
     
     for i in range(0,nb_section):
         motif = motifs[randrange(0,5,1)]
         m_wall.append(motif)
     
     for i in range(0,nb_section):
-        xs_g = 5+3*length_case*(i%5)
-        ys_g = 5+3*length_case*(int(i/5))
+        xs_g = 5+3*length_case*(i%int(length_laby/3))
+        ys_g = 5+3*length_case*(int(i/int(length_laby/3)))
+        print(xs_g, ys_g, nb_section)
         for j in range(0,9):
             x1 = xs_g + (j%3)*length_case
             x2 = x1 + length_case
@@ -99,18 +100,21 @@ def laby():
                 tout_les_cases.append(Case(x1,y1,x2,y2,couleurCase,'',0))
                 
             tout_les_cases[-1].creerRectangle('case')
-       
-    while x1 < length_laby*length_case and  y1 < length_laby*length_case :
+    
+    x1, y1, x2, y2 = 5, 5, 5+length_section*length_case, 5+length_section*length_case
+    i=1
+    
+    while x1 < length_laby*length_case and  y1 < heigh_laby*length_case :
     
         tout_les_section.append(Case(x1,y1,x2,y2,'','',0)) 
         
         tout_les_section[-1].creerRectangle('section')
         
-        i,ite,x1,x2 = i+1, ite+1, x1+length_section, x2+length_section
+        i,ite,x1,x2 = i+1, ite+1, x1+length_section*length_case, x2+length_section*length_case
         
         if ite == int(length_laby/3):
-            y1, y2 = y1 + length_section, y2 + length_section
-            ite, x1, x2 = 0, 5, 5+length_section
+            y1, y2 = y1 + length_section*length_case, y2 + length_section*length_case
+            ite, x1, x2 = 0, 5, 5+length_section*length_case
         
     for case in tout_les_cases:
         case.placerPion()
@@ -119,9 +123,10 @@ def laby():
     score.pack()
     
 #initialisation des variables
-length_laby = 15 # Case number, choisir un multiple de 3 svp
+length_laby = 30 # Case number, choisir un multiple de 3 svp
+heigh_laby = 15
 length_case = 60 # pixel number, multiple de 3 svp
-length_section = 3
+length_section = 3 #nb_case
 eps = 3
 tout_les_cases = []
 tout_les_section = []
@@ -192,20 +197,18 @@ def click_d(event):
         yc = (yg_s + yd_s)/2
         for i in range(len(section_matrix)):
             coord = can.coords(section_matrix[i])
-            print('xc=',xc,'yc=',yc)
-            print('coord=',coord)
             xg, yg = rotate(xc, yc, pi/2, coord[0], coord[1])
             xd, yd = rotate(xc, yc, pi/2, coord[2], coord[3])
-            print('coord_out=',xg,yg,xd,yd)
             deplacement = [[xg, yg,xd,yd]] #A terminer, comprendre
             can.coords(section_matrix[i], deplacement[0])
             #print('section_matrix',can.coords(section_matrix[i]))
         caseDepart = trouverCase(coord)
        #print(coord)
-        if caseDepart.couleurPion == session:
-            pionClicker = 0
-        else:
-            pionClicker = clicker[1]
+       
+        #if caseDepart.couleurPion == session:
+        #    pionClicker = 0
+        #else:
+        #    pionClicker = clicker[1]
         
 def bouger(event):
     global caseDepart, pionClicker
@@ -227,10 +230,11 @@ def arret(event):
 
 fen = Tk()
 fen.title('labyrinthe')
-size_window = length_laby*length_case + 40
-fen.geometry(f'{size_window}x{size_window}+450+250')
+length_window = length_laby*length_case + 40
+heigh_window = heigh_laby*length_case + 40
+fen.geometry(f'{length_window}x{heigh_window}+200+250')
 fen.configure(bg = 'white')
-can = Canvas(fen, width = length_laby*length_case+10, heigh = length_laby*length_case+10, bg = 'pink')
+can = Canvas(fen, width = length_laby*length_case+10, heigh = heigh_laby*length_case+10, bg = 'pink')
     
 font = 'arial 13 bold'
     
