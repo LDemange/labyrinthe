@@ -65,12 +65,6 @@ class Case:
             return 0
         else:
             return 0 # A terminer
-        
-def buildSection(num):
-    xs_g = 5+3*length_case*(num-1)
-    ys_g = 5+3*length_case*(int(num/5))
-    return xs_g, ys_g
-    
     
 def laby():
     ite, i, couleurCase = 0,1,'#f07ab7'
@@ -79,13 +73,13 @@ def laby():
     nb_section = int(length_laby*heigh_laby/9)
     
     for i in range(0,nb_section):
-        motif = motifs[randrange(0,5,1)]
+        motif = motifs[randrange(0,nb_motifs,1)]
         m_wall.append(motif)
     
     for i in range(0,nb_section):
-        xs_g = 5+3*length_case*(i%int(length_laby/3))
-        ys_g = 5+3*length_case*(int(i/int(length_laby/3)))
-        print(xs_g, ys_g, nb_section)
+        xs_g = offset_x+3*length_case*(i%int(length_laby/3))
+        ys_g = offset_y+3*length_case*(int(i/int(length_laby/3)))
+        
         for j in range(0,9):
             x1 = xs_g + (j%3)*length_case
             x2 = x1 + length_case
@@ -101,21 +95,37 @@ def laby():
                 
             tout_les_cases[-1].creerRectangle('case')
     
-    x1, y1, x2, y2 = 5, 5, 5+length_section*length_case, 5+length_section*length_case
+
+    
+    Case(0,offset_y,offset_x+length_laby*length_case,offset_y-length_case,'black','',0).creerRectangle('case')
+    Case(0,offset_y+heigh_laby*length_case,offset_x+length_laby*length_case,offset_y+(heigh_laby+1)*length_case,'black','',0).creerRectangle('case')
+    Case(0,offset_y,length_case,offset_y+(heigh_laby)*length_case,'black','',0).creerRectangle('case')
+    
+    for i in range(0, heigh_laby):
+        for j in range(0,2):
+            Case(length_case*(j+1),offset_y+length_case*i,length_case*(j+2),offset_y+length_case*(i+1),'white','',0).creerRectangle('case')
+        
+    for i in range(0, heigh_laby+2):
+        for j in range(0,3):
+            Case(offset_x + length_case*(length_laby+j),length_case*i,offset_x + length_case*(length_laby+j+1),length_case*(i+1),'white','',0).creerRectangle('case')    
+    
+    x1, y1, x2, y2 = offset_x, offset_y, offset_x+length_section*length_case, offset_y+length_section*length_case
     i=1
     
-    while x1 < length_laby*length_case and  y1 < heigh_laby*length_case :
+    
+    while x1 < length_laby*length_case + offset_x and  y1 < heigh_laby*length_case +offset_y :
     
         tout_les_section.append(Case(x1,y1,x2,y2,'','',0)) 
         
         tout_les_section[-1].creerRectangle('section')
-        
+
         i,ite,x1,x2 = i+1, ite+1, x1+length_section*length_case, x2+length_section*length_case
         
         if ite == int(length_laby/3):
             y1, y2 = y1 + length_section*length_case, y2 + length_section*length_case
-            ite, x1, x2 = 0, 5, 5+length_section*length_case
-        
+            ite, x1, x2 = 0, offset_x, offset_x+length_section*length_case
+            
+       
     for case in tout_les_cases:
         case.placerPion()
         
@@ -124,9 +134,11 @@ def laby():
     
 #initialisation des variables
 length_laby = 30 # Case number, choisir un multiple de 3 svp
-heigh_laby = 15
-length_case = 60 # pixel number, multiple de 3 svp
+heigh_laby = 18
+length_case = 45 # pixel number, multiple de 3 svp
 length_section = 3 #nb_case
+offset_y = length_case
+offset_x = 3*length_case
 eps = 3
 tout_les_cases = []
 tout_les_section = []
@@ -139,11 +151,11 @@ def trouverCase(coord):
     return 0
 
 def findCoordSection(coord):
-    num_x = ceil((coord[2]+coord[0])/(3*2*length_case))
-    num_y = ceil((coord[3]+coord[1])/(3*2*length_case))
-    print('num=',num_x,num_y)
-    xg_s = 5 + 3*length_case*(num_x-1)
-    yg_s = 5 + 3*length_case*(num_y-1)
+    num_x = ceil((coord[2]+coord[0])/(3*2*length_case)-1)
+    num_y = ceil((coord[3]+coord[1])/(3*2*length_case)-1/3)
+ 
+    xg_s = offset_x + 3*length_case*(num_x-1)
+    yg_s = offset_y + 3*length_case*(num_y-1)
     
     xd_s = xg_s + length_case*3
     yd_s = yg_s + length_case*3
@@ -169,9 +181,7 @@ def click_g(event):
     clicker = can.find_overlapping(x,y,x,y)
     if len(clicker) > 0 :
         coord = can.coords(clicker[0])
-        print(coord[0],coord[1],coord[2],coord[3])
         caseDepart = trouverCase(coord)
-       #print(coord)
         if caseDepart.couleurPion == session:
             pionClicker = 0
         else:
@@ -187,23 +197,19 @@ def click_d(event):
     clicker = can.find_overlapping(x,y,x,y)
     if len(clicker) > 0 :
         coord = can.coords(clicker[0])
-        #print('click2=',coord[0],coord[1],coord[2],coord[3])
-        #print('section=',findCoordSection(coord))
         xg_s, yg_s, xd_s, yd_s = findCoordSection(coord)
-        #print('xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps=',xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps)
         section_matrix = can.find_overlapping(xg_s+eps, yg_s+eps, xd_s-eps, yd_s-eps)
-        #print('len=',len(section_matrix))
         xc = (xg_s + xd_s)/2
         yc = (yg_s + yd_s)/2
-        for i in range(len(section_matrix)):
-            coord = can.coords(section_matrix[i])
-            xg, yg = rotate(xc, yc, pi/2, coord[0], coord[1])
-            xd, yd = rotate(xc, yc, pi/2, coord[2], coord[3])
-            deplacement = [[xg, yg,xd,yd]] #A terminer, comprendre
-            can.coords(section_matrix[i], deplacement[0])
-            #print('section_matrix',can.coords(section_matrix[i]))
-        caseDepart = trouverCase(coord)
-       #print(coord)
+        if(y > offset_y and y < offset_y + heigh_laby * length_case and x > offset_x and x< offset_x + length_laby*length_case ):
+            for i in range(len(section_matrix)):
+                coord = can.coords(section_matrix[i])
+                xg, yg = rotate(xc, yc, pi/2, coord[0], coord[1])
+                xd, yd = rotate(xc, yc, pi/2, coord[2], coord[3])
+                deplacement = [[xg, yg,xd,yd]] #A terminer, comprendre
+                can.coords(section_matrix[i], deplacement[0])
+                caseDepart = trouverCase(coord)
+       
        
         #if caseDepart.couleurPion == session:
         #    pionClicker = 0
@@ -230,11 +236,11 @@ def arret(event):
 
 fen = Tk()
 fen.title('labyrinthe')
-length_window = length_laby*length_case + 40
-heigh_window = heigh_laby*length_case + 40
+length_window = (length_laby+6)*length_case + 40
+heigh_window = (heigh_laby+2)*length_case + 40
 fen.geometry(f'{length_window}x{heigh_window}+200+250')
 fen.configure(bg = 'white')
-can = Canvas(fen, width = length_laby*length_case+10, heigh = heigh_laby*length_case+10, bg = 'pink')
+can = Canvas(fen, width = (length_laby+6)*length_case+10, heigh = (heigh_laby+2)*length_case+10, bg = 'white') #pink
     
 font = 'arial 13 bold'
     
